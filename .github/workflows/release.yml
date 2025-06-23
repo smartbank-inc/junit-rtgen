@@ -79,31 +79,31 @@ jobs:
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Package binary
+      - name: Package binary (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          mkdir dist
+          copy target\${{ matrix.target }}\release\junit-rtgen.exe dist\
+          cd dist
+          7z a ..\junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}.zip junit-rtgen.exe
+        shell: cmd
+
+      - name: Package binary (Unix)
+        if: matrix.os != 'windows-latest'
         run: |
           mkdir -p dist
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            cp target/${{ matrix.target }}/release/junit-rtgen${{ matrix.suffix }} dist/
-          else
-            cp target/${{ matrix.target }}/release/junit-rtgen dist/
-          fi
-
-          # Create archive
+          cp target/${{ matrix.target }}/release/junit-rtgen dist/
           cd dist
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            7z a ../junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}.zip junit-rtgen${{ matrix.suffix }}
-          else
-            tar czf ../junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}.tar.gz junit-rtgen
-          fi
+          tar czf ../junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}.tar.gz junit-rtgen
 
-      - name: Upload Release Asset
+      - name: Upload Release Asset (Windows)
+        if: matrix.os == 'windows-latest'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          ASSET_PATH="./junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}"
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            ASSET_PATH="${ASSET_PATH}.zip"
-          else
-            ASSET_PATH="${ASSET_PATH}.tar.gz"
-          fi
-          gh release upload ${{ github.event.inputs.version }} "${ASSET_PATH}"
+        run: gh release upload ${{ github.event.inputs.version }} junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}.zip
+
+      - name: Upload Release Asset (Unix)
+        if: matrix.os != 'windows-latest'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload ${{ github.event.inputs.version }} junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}.tar.gz
