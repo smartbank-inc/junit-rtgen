@@ -22,9 +22,9 @@ junit-rtgen is a Rust CLI tool that converts JUnit XML format files to ParallelT
 
 ### Code Quality
 - `cargo fmt` - Format code according to Rust style guidelines
-- `cargo fmt --check` - Check if code is properly formatted
+- `cargo fmt --all -- --check` - Check if code is properly formatted (CI command)
 - `cargo clippy` - Run the Rust linter for code improvements
-- `cargo clippy -- -D warnings` - Treat clippy warnings as errors
+- `cargo clippy --all-targets --all-features -- -D warnings` - Run clippy with all targets and treat warnings as errors (CI command)
 
 ### Documentation
 - `cargo doc` - Generate documentation
@@ -48,3 +48,11 @@ The tool's purpose is to enable Ruby/RSpec projects using ParallelTests to lever
 - Follow Rust naming conventions (snake_case for functions/variables, CamelCase for types)
 - Use `cargo fmt` before committing code
 - Run `cargo clippy` to catch common mistakes
+
+## CI/CD
+
+GitHub Actions workflow (`.github/workflows/rust.yml`) runs on push to main and pull requests:
+- Runs `cargo check` to verify compilation
+- Runs `cargo fmt --all -- --check` to ensure consistent formatting
+- Runs `cargo clippy --all-targets --all-features -- -D warnings` to catch code issues
+- Runs `cargo test` to execute all tests
