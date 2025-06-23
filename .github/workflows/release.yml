@@ -1,0 +1,109 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          # Get the latest tag (if any) or use the first commit
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)
+
+          # Generate changelog from commits
+          echo "## Changes" > release_notes.md
+          echo "" >> release_notes.md
+          git log ${LAST_TAG}..HEAD --pretty=format:"- %s" --reverse >> release_notes.md
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ github.event.inputs.version }} \
+            --title "${{ github.event.inputs.version }}" \
+            --notes-file release_notes.md
+
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    needs: create-release
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            suffix: ""
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            suffix: ""
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            suffix: ""
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            suffix: ""
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            suffix: ".exe"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install musl tools
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get install -y musl-tools
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package binary
+        run: |
+          mkdir -p dist
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cp target/${{ matrix.target }}/release/junit-rtgen${{ matrix.suffix }} dist/
+          else
+            cp target/${{ matrix.target }}/release/junit-rtgen dist/
+          fi
+
+          # Create archive
+          cd dist
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            7z a ../junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}.zip junit-rtgen${{ matrix.suffix }}
+          else
+            tar czf ../junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}.tar.gz junit-rtgen
+          fi
+
+      - name: Upload Release Asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ASSET_PATH="./junit-rtgen-${{ github.event.inputs.version }}-${{ matrix.target }}"
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            ASSET_PATH="${ASSET_PATH}.zip"
+          else
+            ASSET_PATH="${ASSET_PATH}.tar.gz"
+          fi
+          gh release upload ${{ github.event.inputs.version }} "${ASSET_PATH}"

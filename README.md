@@ -13,6 +13,26 @@ A CLI tool that converts JUnit XML format files to ParallelTests::RSpec::Runtime
 
 ## Installation
 
+### Download Pre-built Binaries (Recommended)
+
+Download the latest release for your platform from the [GitHub Releases](https://github.com/smartbank-inc/junit-rtgen/releases) page:
+
+- **Linux (x86_64)**: `junit-rtgen-vX.X.X-x86_64-unknown-linux-gnu.tar.gz`
+- **Linux (musl)**: `junit-rtgen-vX.X.X-x86_64-unknown-linux-musl.tar.gz`
+- **macOS (Intel)**: `junit-rtgen-vX.X.X-x86_64-apple-darwin.tar.gz`
+- **macOS (Apple Silicon)**: `junit-rtgen-vX.X.X-aarch64-apple-darwin.tar.gz`
+- **Windows**: `junit-rtgen-vX.X.X-x86_64-pc-windows-msvc.zip`
+
+```bash
+# Example for Linux
+curl -LO https://github.com/smartbank-inc/junit-rtgen/releases/latest/download/junit-rtgen-v1.0.0-x86_64-unknown-linux-gnu.tar.gz
+tar xzf junit-rtgen-v1.0.0-x86_64-unknown-linux-gnu.tar.gz
+chmod +x junit-rtgen
+sudo mv junit-rtgen /usr/local/bin/
+```
+
+### Build from Source
+
 ```bash
 # Clone the repository
 git clone https://github.com/smartbank-inc/junit-rtgen.git
@@ -83,6 +103,33 @@ cargo clippy
 # Build and run
 cargo run < sample.xml
 ```
+
+## Release Process
+
+To create a new release:
+
+1. **Update version in `Cargo.toml`**:
+   ```toml
+   version = "1.0.0"
+   ```
+
+2. **Commit and push the version change**:
+   ```bash
+   git commit -am "Bump version to 1.0.0"
+   git push
+   ```
+
+3. **Trigger the release workflow**:
+   - Go to [GitHub Actions](https://github.com/smartbank-inc/junit-rtgen/actions)
+   - Select "Release" workflow
+   - Click "Run workflow"
+   - Enter version (e.g., `v1.0.0`)
+   - Click "Run workflow"
+
+The workflow will automatically:
+- Generate release notes from recent commits
+- Build binaries for all supported platforms
+- Create a GitHub release with downloadable assets
 
 ## License
 

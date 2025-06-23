@@ -77,8 +77,27 @@ The project is structured as a Rust library with CLI wrapper, implementing dual 
 
 ## CI/CD
 
-GitHub Actions workflow (`.github/workflows/rust.yml`) runs on push to main and pull requests:
+### Continuous Integration (`.github/workflows/rust.yml`)
+Runs on push to main and pull requests:
 - Runs `cargo check` to verify compilation
 - Runs `cargo fmt --all -- --check` to ensure consistent formatting
 - Runs `cargo clippy --all-targets --all-features -- -D warnings` to catch code issues
 - Runs `cargo test` to execute all tests
+
+### Release Process (`.github/workflows/release.yml`)
+Manual release workflow triggered via GitHub Actions `workflow_dispatch`:
+
+**Steps to create a release:**
+1. Update `version` in `Cargo.toml` (e.g., `"1.0.0"`)
+2. Commit and push: `git commit -am "Bump version to 1.0.0" && git push`
+3. Go to GitHub Actions → "Release" workflow → "Run workflow"
+4. Enter version tag (e.g., `v1.0.0`) and run
+
+**Workflow automatically:**
+- Generates release notes from commit history since last tag
+- Builds binaries for multiple platforms:
+  - Linux (x86_64-unknown-linux-gnu, x86_64-unknown-linux-musl)
+  - macOS (x86_64-apple-darwin, aarch64-apple-darwin)
+  - Windows (x86_64-pc-windows-msvc)
+- Creates GitHub release with downloadable binary archives
+- No crates.io publishing (binaries-only distribution)
