@@ -137,7 +137,7 @@ The workflow will automatically:
 
 ## License
 
-MIT License (see LICENSE file)
+[MIT License](LICENSE)
 
 ## References
 
