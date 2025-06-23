@@ -1,13 +1,9 @@
-use junit_rtgen::process_junit_xml;
-use std::io::{self, Read};
+use junit_rtgen::process_junit_xml_streaming;
+use std::io::{self, stdin};
 
 fn main() -> io::Result<()> {
-    // Read all input from stdin
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input)?;
-
-    // Process the XML and get file times
-    let file_times = process_junit_xml(&input);
+    // Process XML directly from stdin without loading everything into memory
+    let file_times = process_junit_xml_streaming(stdin().lock());
 
     // Output in ParallelTests::RSpec::RuntimeLogger format
     for (file, time) in file_times {
