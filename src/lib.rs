@@ -1,6 +1,6 @@
+use quick_xml::Reader;
 use quick_xml::de::from_str;
 use quick_xml::events::Event;
-use quick_xml::Reader;
 use serde::{Deserialize, Deserializer};
 use std::collections::HashMap;
 use std::io::BufRead;
@@ -232,10 +232,10 @@ mod tests {
 
         let result = process_junit_xml_streaming(input.as_bytes());
         assert_eq!(result.len(), 2);
-        
+
         let foo_time = result.get("./spec/foo.rb").unwrap();
         assert!((foo_time - 0.23456).abs() < 0.00001);
-        
+
         let bar_time = result.get("./spec/bar.rb").unwrap();
         assert!((bar_time - 0.10101).abs() < 0.00001);
     }
