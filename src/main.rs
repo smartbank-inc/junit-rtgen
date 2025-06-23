@@ -50,8 +50,8 @@ fn main() -> io::Result<()> {
                     }
                 }
             }
-            Err(_) => {
-                // Silently ignore parsing errors for now
+            Err(e) => {
+                eprintln!("Error parsing XML: {}", e);
             }
         }
     }
