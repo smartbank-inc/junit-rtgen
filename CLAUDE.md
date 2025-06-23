@@ -86,7 +86,14 @@ Runs on push to main and pull requests:
 
 ### Release Process (`.github/workflows/release.yml`)
 Manual release workflow triggered via GitHub Actions `workflow_dispatch`:
-- Input: Release version (e.g., `v1.0.0`)
+
+**Steps to create a release:**
+1. Update `version` in `Cargo.toml` (e.g., `"1.0.0"`)
+2. Commit and push: `git commit -am "Bump version to 1.0.0" && git push`
+3. Go to GitHub Actions → "Release" workflow → "Run workflow"
+4. Enter version tag (e.g., `v1.0.0`) and run
+
+**Workflow automatically:**
 - Generates release notes from commit history since last tag
 - Builds binaries for multiple platforms:
   - Linux (x86_64-unknown-linux-gnu, x86_64-unknown-linux-musl)

@@ -104,6 +104,33 @@ cargo clippy
 cargo run < sample.xml
 ```
 
+## Release Process
+
+To create a new release:
+
+1. **Update version in `Cargo.toml`**:
+   ```toml
+   version = "1.0.0"
+   ```
+
+2. **Commit and push the version change**:
+   ```bash
+   git commit -am "Bump version to 1.0.0"
+   git push
+   ```
+
+3. **Trigger the release workflow**:
+   - Go to [GitHub Actions](https://github.com/smartbank-inc/junit-rtgen/actions)
+   - Select "Release" workflow
+   - Click "Run workflow"
+   - Enter version (e.g., `v1.0.0`)
+   - Click "Run workflow"
+
+The workflow will automatically:
+- Generate release notes from recent commits
+- Build binaries for all supported platforms
+- Create a GitHub release with downloadable assets
+
 ## License
 
 MIT License (see LICENSE file)
