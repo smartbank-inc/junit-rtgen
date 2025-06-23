@@ -1,6 +1,8 @@
 [package]
 name = "junit-rtgen"
-version = "0.1.1"
+version = "1.0.0"
+license = "MIT"
+authors = ["Stefan Utamaru <github.le5ke@stenyan.jp>"]
 edition = "2024"
 
 [dependencies]
